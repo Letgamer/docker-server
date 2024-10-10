@@ -1,0 +1,27 @@
+/.git
+# mostly Github environment variables
+.env
+# Crafty Data
+crafty/crafty
+# Gitea
+gitea/gitea
+gitea/pgdata
+# Outline
+outline/data/
+outline/database-data/
+outline/pgdata/
+# Postgres
+postgres/pgadmin/
+postgres/data/
+#Immich
+/immich
+# Template
+docker-compose.yaml.template
+# Vaultwarden Vault
+vaultwarden/data
+# Tailscale
+tailscale/data
+# Coudflared
+proxy-tunnel/cloudflared/*
+# Matrix
+/matrix

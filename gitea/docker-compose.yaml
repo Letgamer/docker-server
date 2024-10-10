@@ -1,0 +1,124 @@
+services:
+  gitea:
+    image: docker.io/gitea/gitea:latest-rootless
+    container_name: gitea
+    restart: always
+    environment:
+      ## Application name, used in the page title.
+      APP_NAME: '${TITLE}: Git alternative to Github'
+      ## Default configuration for email notifications for users (user configurable). Options: enabled, onmention, disabled
+      GITEA__admin__DEFAULT_EMAIL_NOTIFICATIONS: 'disabled'
+      ## The database type in use [mysql, postgres, mssql, sqlite3].
+      GITEA__database__DB_TYPE: 'postgres'
+      ## Database host address and port or absolute path for unix socket [mysql, postgres]
+      GITEA__database__HOST: 'gitea-postgres:5432'
+      ## Database name.
+      GITEA__database__NAME: '${POSTGRES}'
+      ## Database user password. Use `your password` or """your password""" for quoting if you use special characters in the password.
+      GITEA__database__PASSWD: '${POSTGRES_PWD}'
+      ## Database username.
+      GITEA__database__USER: '${POSTGRES}'
+      ## Set the Logging
+      GITEA__log__LEVEL: 'Error'
+      ## Allow authentication in via OpenID
+      GITEA__openid__ENABLE_OPENID_SIGNIN: 'true'
+      ## Allow registering via OpenID
+      GITEA__openid__ENABLE_OPENID_SIGNUP: 'true'
+      ## If non-empty, list of POSIX regex patterns matching OpenID URI's to permit.
+      GITEA__openid__WHITELISTED_URIS: 'auth.${DOMAIN}'
+      ## Disable registration, after which only admin can create accounts for users.
+      GITEA__service__DISABLE_REGISTRATION: 'false'
+      ## Set to true to force registration only using third-party services.
+      GITEA__service__ALLOW_ONLY_EXTERNAL_REGISTRATION: 'true'
+      ## Show Registration Button
+      GITEA__service__SHOW_REGISTRATION_BUTTON: 'false'
+      ## Show Gitea and Go version information in the footer.
+      GITEA__other__SHOW_FOOTER_VERSION: 'false'
+      ## Comma separated list of default forked repo units. The set of allowed values and rules is the same as DEFAULT_REPO_UNITS.
+      GITEA__repository__DEFAULT_FORK_REPO_UNITS: 'repo.code,repo.releases,repo.issues,repo.pulls,repo.wiki,repo.projects,repo.packages,repo.actions'
+      ## Disable SSH feature when it's not available.
+      GITEA__server__DISABLE_SSH: 'true'
+      ## Domain name of this server.
+      GITEA__server__DOMAIN: 'gitea.${DOMAIN}'
+      ## Enable gzip compression for runtime-generated content, static resources excluded.
+      GITEA__server__ENABLE_GZIP: 'true'
+      ## HTTP listen port.
+      GITEA__server__HTTP_PORT: 80
+      ## Overwrite the automatically generated public URL. This is useful if the internal and the external URL don't match (e.g. in Docker).
+      GITEA__server__ROOT_URL: 'https://git.${DOMAIN}/'
+      ## Domain name of this server, used for displayed clone URL.
+      GITEA__server__SSH_DOMAIN: 'git.${DOMAIN}'
+      ## Name of cookie used to store authentication information.
+      GITEA__security__COOKIE_REMEMBER_NAME: 'git_remember'
+      ## Name of the cookie used to store the current username.
+      GITEA__security__COOKIE_USERNAME: 'git_username'
+      ## Controls access to the installation page. When set to "true", the installation page is not accessible.
+      GITEA__security__INSTALL_LOCK: 'true'
+      ## The name of the cookie used for the session ID.
+      GITEA__session__COOKIE_NAME: 'session'
+      ## Default location of time on the UI, so that we can display correct user's time on UI. i.e. Asia/Shanghai
+      GITEA__time__DEFAULT_UI_LOCATION: 'Etc/UTC'
+      ## Additional Emojis not defined in the utf8 standard. By default, we support Gitea (:gitea:), to add more copy them to public/assets/img/emoji/emoji_name.png and add it to this config.
+      GITEA__ui__CUSTOM_EMOJIS: 'codeberg, gitlab, git, github, gogs'
+      ## Set the default theme for the Gitea install.
+      GITEA__ui__DEFAULT_THEME: 'github'
+      ## All available themes. Allow users select personalized themes. regardless of the value of DEFAULT_THEME.
+      GITEA__ui__THEMES: 'github'
+      ## Author meta tag of the homepage.
+      GITEA__ui.meta__AUTHOR: '${TITLE}: Git alternative to Github'
+      ## Description meta tag of the homepage.
+      GITEA__ui.meta__DESCRIPTION: '${TITLE}: Git alternative to Github is a painless self-hosted Git service written in Go'
+      ## Keywords meta tag of the homepage.
+      GITEA__ui.meta__KEYWORDS: 'go,git,self-hosted'
+      USER_UID: 1000
+      USER_GID: 1000
+    healthcheck:
+        test: ['CMD-SHELL', 'curl --fail http://localhost/api/healthz || exit 1']
+    depends_on:
+      gitea-postgres:
+        condition: service_healthy
+    volumes:
+      - ./public:/var/lib/gitea/custom/public
+      - ./gitea:/data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.gitea.rule=Host(`git.${DOMAIN}`)
+      - traefik.http.routers.gitea.entrypoints=websecure
+      - traefik.http.routers.gitea.tls=true
+      - traefik.http.routers.gitea.service=gitea
+      - traefik.http.services.gitea.loadbalancer.server.port=80
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+    networks:
+      - gitea
+      - cloudflaretunnel
+
+  gitea-postgres:
+    image: docker.io/postgres:16-alpine
+    container_name: gitea-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: '${POSTGRES}'
+      POSTGRES_PASSWORD: '${POSTGRES_PWD}'
+      POSTGRES_DB: '${POSTGRES}'
+      PGUSER: '${POSTGRES}'
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=C --lc-ctype=C"
+    healthcheck:
+        test: ["CMD-SHELL", "pg_isready", "-U", "${POSTGRES}", "-d", "${POSTGRES}"]
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+    networks:
+      - gitea
+
+networks:
+  gitea:
+  cloudflaretunnel:
+    external: true

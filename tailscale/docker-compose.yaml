@@ -1,0 +1,39 @@
+services:
+  tailscale:
+    image: docker.io/tailscale/tailscale:latest
+    container_name: tailscale
+    restart: always
+    privileged: true
+    user: root
+    ## This will become the tailscale device name
+    hostname: letserver
+    network_mode: "host"
+    environment:
+      ## Accept DNS configuration from the admin console. Not accepted by default, but apperently needs to be set explicitly in order to not show any error on startup
+      TS_ACCEPT_DNS: 'true'
+      ## An auth key used to authenticate the container.
+      TS_AUTHKEY: '${TS_AUTHKEY}'
+      ## ENables a healthcheck endpoint on /healthz
+      TS_HEALTHCHECK_ADDR_PORT: '127.0.0.1:8000'
+      ## Advertise subnet routes to access the local network
+      TS_ROUTES: '${ROUTES}'
+      ## Disables setting nftable or iptable rules.
+      #TS_DEBUG_FIREWALL_MODE: 'auto'
+      ## Any other flags to pass in to the Tailscale CLI in a tailscale set command.
+      TS_EXTRA_ARGS: '--advertise-exit-node --netfilter-mode=off'
+      ## Use the specified hostname for the node. 
+      TS_HOSTNAME: '${TS_HOSTNAME}'
+      ## Directory where the state of tailscaled is stored. This needs to persist across container restarts.
+      TS_STATE_DIR: /var/lib/tailscale
+      ## Enables kernel networking instead of user space networking
+      TS_USERSPACE: '0'
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:8000/healthz || exit 1"]
+    volumes:
+      ## State data will be stored in this directory
+      - ./data:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - net_admin
+      - sys_module
+      - net_raw

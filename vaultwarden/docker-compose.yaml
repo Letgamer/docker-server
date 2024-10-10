@@ -1,0 +1,69 @@
+services:
+  vaultwarden:
+    image: vaultwarden/server:alpine
+    container_name: vaultwarden
+    restart: always
+    environment:
+      ## Enables push notifications (requires key and id from https://bitwarden.com/host)
+      PUSH_ENABLED: 'true'
+      PUSH_INSTALLATION_ID: '${PUSH_INSTALLATION_ID}'
+      PUSH_INSTALLATION_KEY: '${PUSH_INSTALLATION_KEY}'
+      PUSH_RELAY_URI: 'https://api.bitwarden.eu'
+      PUSH_IDENTITY_URI: 'https://identity.bitwarden.eu'
+      ## Controls whether event logging is enabled for organizations
+      ## This setting applies to organizations.
+      ## Disabled by default. Also check the EVENT_CLEANUP_SCHEDULE and EVENTS_DAYS_RETAIN settings.
+      ORG_EVENTS_ENABLED: 'true'
+      ## Number of days to retain events stored in the database.
+      ## If unset (the default), events are kept indefinitely and the scheduled job is disabled!
+      EVENTS_DAYS_RETAIN: 30
+      ## BETA FEATURE: Groups
+      ## Controls whether group support is enabled for organizations
+      ## This setting applies to organizations.
+      ## Disabled by default because this is a beta feature, it contains known issues!
+      ## KNOW WHAT YOU ARE DOING!
+      ORG_GROUPS_ENABLED: 'true'
+      ## Logging to Syslog
+      ## This requires extended logging
+      USE_SYSLOG: 'true'
+      ## Controls if new users can register
+      SIGNUPS_ALLOWED: 'false'
+      ## Controls if new users from a list of comma-separated domains can register
+      ## even if SIGNUPS_ALLOWED is set to false
+      SIGNUPS_DOMAINS_WHITE_LIST: 'vaultwarden.${DOMAIN}'
+      ## Invitations org admins to invite users, even when signups are disabled
+      INVITATIONS_ALLOWED: 'false'
+      ## Number of days to wait before auto-deleting a trashed item.
+      ## If unset (the default), trashed items are not auto-deleted.
+      ## This setting applies globally, so make sure to inform all users of any changes to this setting.
+      TRASH_AUTO_DELETE_DAYS: 30
+      ## Controls whether users can set password hints. This setting applies globally to all users.
+      PASSWORD_HINTS_ALLOWED: 'false'
+      ## Domain settings
+      ## The domain must match the address from where you access the server
+      ## It's recommended to configure this value, otherwise certain functionality might not work,
+      ## like attachment downloads, email links and U2F.
+      ## For U2F to work, the server must use HTTPS, you can use Let's Encrypt for free certs
+      DOMAIN: 'https://vaultwarden.${DOMAIN}'
+    healthcheck:
+        test: ['CMD-SHELL', './healthcheck.sh || exit 1']
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.vaultwarden.rule=Host(`vaultwarden.${DOMAIN}`)
+      - traefik.http.routers.vaultwarden.entrypoints=websecure
+      - traefik.http.routers.vaultwarden.tls=true
+      - traefik.http.routers.vaultwarden.service=vaultwarden
+      - traefik.http.services.vaultwarden.loadbalancer.server.port=80
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+    volumes:
+      - ./data/:/data/
+    networks:
+      - cloudflaretunnel
+
+networks:
+  cloudflaretunnel:
+    external: true

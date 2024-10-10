@@ -1,0 +1,91 @@
+services:
+  outline:
+    image: docker.getoutline.com/outlinewiki/outline:latest
+    container_name: outline
+    restart: always
+    environment:
+      NODE_ENV: "production"
+      SECRET_KEY: "${SECRET_KEY}"
+      UTILS_SECRET: "${UTILS_SECRET}"
+      DATABASE_URL: "postgres://postgres:${DB_PASS}@postgres:5432/postgres"
+      PGSSLMODE: "disable"
+      REDIS_URL: "redis://redis:6379"
+      URL: "https://outline.${DOMAIN}"
+      PORT: "3000"
+      FILE_STORAGE: "local"
+      FILE_STORAGE_LOCAL_ROOT_DIR: "/var/lib/outline/data"
+      FILE_STORAGE_UPLOAD_MAX_SIZE: "262144000"
+      OIDC_CLIENT_ID: "${CLIENT_ID}"
+      OIDC_CLIENT_SECRET: "${CLIENT_SECRET}"
+      OIDC_AUTH_URI: "https://git.${DOMAIN}/login/oauth/authorize"
+      OIDC_TOKEN_URI: "https://git.${DOMAIN}/login/oauth/access_token"
+      OIDC_USERINFO_URI: "https://git.${DOMAIN}/login/oauth/userinfo"
+      OIDC_LOGOUT_URI: "https://outline.${DOMAIN}"
+      OIDC_DISPLAY_NAME: 'Gitea'
+      OIDC_SCOPES: 'openid profile email'
+      FORCE_HTTPS: 'false'
+      ENABLE_UPDATES: 'false'
+      LOG_LEVEL: 'info'
+      DEFAULT_LANGUAGE: 'en_US'
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    volumes:
+    - ./data:/var/lib/outline/data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.outline.rule=Host(`outline.${DOMAIN}`)
+      - traefik.http.routers.outline.entrypoints=websecure
+      - traefik.http.routers.outline.tls=true
+      - traefik.http.routers.outline.service=outline
+      - traefik.http.services.outline.loadbalancer.server.port=3000
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+    networks:
+      - outline
+      - cloudflaretunnel
+
+  redis:
+    image: docker.io/redis:alpine
+    container_name: outline-redis
+    restart: always
+    healthcheck:
+        test: ["CMD", "redis-cli","ping"]
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+    networks:
+      - outline
+
+  postgres:
+    image: docker.io/postgres:alpine
+    container_name: outline-postgres
+    restart: always
+    environment:
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=C --lc-ctype=C"
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASS}
+      PGUSER: postgres
+    healthcheck:
+        test: ["CMD-SHELL", "pg_isready", "-U","-q", "postgres", "-d", "postgres"]
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+    networks:
+      - outline
+
+networks:
+  outline:
+  cloudflaretunnel:
+    external: true

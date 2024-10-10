@@ -1,0 +1,19 @@
+configs:
+  config.yml:
+    content: |
+      tunnel: ${UUID}
+      credentials-file: /etc/cloudflared/${UUID}.json
+      ingress:
+        - hostname: '*.${DOMAIN}'
+          service: https://traefik
+          originRequest:
+            originServerName: '*.${DOMAIN}'
+            http2Origin: true
+            noTLSVerify: true
+        - hostname: '${DOMAIN}'
+          service: https://traefik
+          originRequest:
+            originServerName: '${DOMAIN}'
+            http2Origin: true
+            noTLSVerify: true
+        - service: http_status:404

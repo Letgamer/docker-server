@@ -1,0 +1,74 @@
+services:
+  tunnel:
+    image: erisamoe/cloudflared:latest
+    container_name: tunnel
+    restart: always
+    command: tunnel run
+    configs:
+      - source: config.yml
+        target: /etc/cloudflared/config.yml
+    volumes:
+      - ./cloudflared:/etc/cloudflared
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+    networks:
+      - cftunnel-transport
+
+  traefik:
+    image: docker.io/traefik:latest
+    container_name: traefik
+    restart: always
+    environment:
+      ## Activate dashboard
+      TRAEFIK_API_DASHBOARD: 'false'
+      ## Entry points definition
+      TRAEFIK_ENTRYPOINTS_WEBSECURE: 'true'
+      ## Entry point address
+      TRAEFIK_ENTRYPOINTS_WEBSECURE_ADDRESS: ':443'
+      ## HTTP/3 configuration
+      TRAEFIK_ENTRYPOINTS_WEBSECURE_HTTP3: 'true'
+      ## Log level set to traefik logs
+      TRAEFIK_LOG_LEVEL: DEBUG
+      ## Enable healthcheck endpoint
+      TRAEFIK_PING: 'true'
+      # Set PING Entrypoint
+      TRAEFIK_PING_ENTRYPOINT: 'ping'
+      ## PING Entry point definition
+      TRAEFIK_ENTRYPOINTS_PING: 'true'
+      ## Entry point address
+      TRAEFIK_ENTRYPOINTS_PING_ADDRESS: ':8080'
+      ## Enable Docker backend with default settings
+      TRAEFIK_PROVIDERS_DOCKER: 'true'
+      ## Docker server endpoint. Can be a tcp or a unix socket endpoint
+      TRAEFIK_PROVIDERS_DOCKER_ENDPOINT: 'unix:///var/run/docker.sock'
+      ## Expose containers by default
+      TRAEFIK_PROVIDERS_DOCKER_EXPOSEDBYDEFAULT: 'false'
+      ## Sets the default network to prevent confusion and timeouts, when connected to multiple networks
+      TRAEFIK_PROVIDERS_DOCKER_NETWORK: 'cloudflaretunnel'
+      ## The TLS connection to Docker accepts any certificate presented by the server regardless of the hostnames it covers
+      TRAEFIK_PROVIDERS_HTTP_TLS_INSECURESKIPVERIFY: 'true'
+      ## The TLS connection to Docker accepts any certificate presented by the server regardless of the hostnames it covers
+      TRAEFIK_SERVERSTRANSPORT_INSECURESKIPVERIFY: 'true'
+    healthcheck:
+        test: ['CMD-SHELL', "wget -nv -t1 --spider 'http://localhost:8080/ping' || exit 1"]
+    depends_on:
+      tunnel:
+        condition: service_started
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+    networks:
+      - cftunnel-transport
+      - cloudflaretunnel
+
+networks:
+  cftunnel-transport:
+  cloudflaretunnel:
+    external: true

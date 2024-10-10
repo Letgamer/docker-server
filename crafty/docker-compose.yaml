@@ -1,0 +1,47 @@
+services:
+  crafty:
+    image: registry.gitlab.com/crafty-controller/crafty-4:latest
+    container_name: crafty
+    restart: always
+    ports:
+      - "25500-25600:25500-25600/tcp"  # Binding to the host's IP address on the local subnet
+      - "25500-25600:25500-25600/udp"
+    environment:
+        TZ: "Etc/UTC"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.crafty.rule=Host(`crafty.${DOMAIN}`)
+      - traefik.http.routers.crafty.entrypoints=websecure
+      - traefik.http.routers.crafty.tls=true
+      - traefik.http.routers.crafty.service=crafty
+      - traefik.http.services.crafty.loadbalancer.server.port=8443
+      - traefik.http.services.crafty.loadbalancer.server.scheme=https
+      - traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https
+    volumes:
+      - ./crafty/backups:/crafty/backups
+      - ./crafty/logs:/crafty/logs
+      - ./crafty/servers:/crafty/servers
+      - ./crafty/config:/crafty/app/config
+      - ./crafty/import:/crafty/import
+    networks:
+      crafty:
+        ipv4_address: '10.1.0.100'
+      cloudflaretunnel:
+
+  playit:
+    container_name: playit
+    image: ghcr.io/playit-cloud/playit-agent:latest
+    restart: always
+    environment:
+      SECRET_KEY: "${SECRET_KEY}"
+    networks:
+      - crafty
+
+networks:
+  crafty:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.1.0.0/16
+  cloudflaretunnel:
+    external: true

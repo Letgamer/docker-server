@@ -1,0 +1,45 @@
+configs:
+  config_distro.py:
+    content: |
+      CA_FILE = '/etc/ssl/certs/ca-certificates.crt'
+      LOG_FILE = '/dev/null'
+      HELP_PATH = '../../docs'
+      DEFAULT_BINARY_PATHS = {
+        'pg': '/usr/local/pgsql-16',
+        'pg-16': '/usr/local/pgsql-16',
+        'pg-15': '/usr/local/pgsql-15',
+        'pg-14': '/usr/local/pgsql-14',
+        'pg-13': '/usr/local/pgsql-13',
+        'pg-12': '/usr/local/pgsql-12'
+      }
+      ENHANCED_COOKIE_PROTECTION = False
+      WTF_CSRF_CHECK_DEFAULT = False
+      WTF_CSRF_ENABLED = False
+      ENABLE_BINARY_PATH_BROWSING = True
+      WEBSERVER_AUTO_CREATE_USER = False
+      ENABLE_PSQL = True
+      DEFAULT_SERVER_PORT = 80
+      DEBUG = True
+      OAUTH2_AUTO_CREATE_USER = True
+      MASTER_PASSWORD_HOOK = ''
+      AUTHENTICATION_SOURCES = ['oauth2']
+      OAUTH2_CONFIG = [
+        {
+          'OAUTH2_NAME': 'Gitea',
+          'OAUTH2_DISPLAY_NAME': 'Gitea',
+          'OAUTH2_CLIENT_ID': '${OAUTH_ID}',
+          'OAUTH2_CLIENT_SECRET': '${OAUTH_SECRET}',
+          'OAUTH2_TOKEN_URL': 'https://git.${DOMAIN}/login/oauth/access_token',
+          'OAUTH2_AUTHORIZATION_URL': 'https://git.${DOMAIN}/login/oauth/authorize',
+          'OAUTH2_SERVER_METADATA_URL': 'https://git.${DOMAIN}/.well-known/openid-configuration',
+          'OAUTH2_API_BASE_URL': 'https://git.${DOMAIN}/login/oauth/',
+          'OAUTH2_USERINFO_ENDPOINT': 'userinfo',
+          'OAUTH2_SCOPE': 'openid email profile',
+          'OAUTH2_USERNAME_CLAIM': None,
+          'OAUTH2_ICON': 'fa-git-alt',
+          'OAUTH2_BUTTON_COLOR': '#f05133',
+          'OAUTH2_ADDITIONAL_CLAIMS': None,
+          'OAUTH2_SSL_CERT_VERIFICATION': True,
+          'OAUTH2_LOGOUT_URL': 'https://pgadmin.${DOMAIN}'
+        }
+      ]
