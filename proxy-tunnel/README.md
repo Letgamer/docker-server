@@ -46,9 +46,3 @@ You can get the UUID from the cloudflared folder after setting up the tunnel!
 
 Traefik is configured through environment variables located in the docker-compose.yaml file.
 
-
-## Startup
-
-Start the Containers with the following command:
-
-`docker compose -f docker-compose.yaml -f docker-compose.conf.yaml up -d`

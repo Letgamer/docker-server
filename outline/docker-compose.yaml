@@ -33,7 +33,7 @@ services:
       postgres:
         condition: service_healthy
     volumes:
-    - ./data:/var/lib/outline/data
+      - ./data:/var/lib/outline/data
     labels:
       - traefik.enable=true
       - traefik.http.routers.outline.rule=Host(`outline.${DOMAIN}`)

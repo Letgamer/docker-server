@@ -25,3 +25,7 @@ tailscale/data
 proxy-tunnel/cloudflared/*
 # Matrix
 /matrix
+# mTLS Creds
+mtls.key.pem
+mtls.cert.pem
+mtls_client_cert.pfx

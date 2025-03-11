@@ -33,7 +33,7 @@ OAUTH_SECRET=
 
 OAUTH ID and Secret can be generated in Gitea under User -> Settings -> Applications
 
-Start the containers with the following command:
+Connect to the Postgres database via cli:
 ```
-docker compose -f docker-compose.yaml -f docker-compose.config.yaml up -d
+psql -h localhost postgres postgres
 ```
