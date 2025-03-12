@@ -27,4 +27,4 @@ PUSH_INSTALLATION_KEY=
 
 Push ID and Key is needed to enable push notifications on mobile clients and can be recieved from here: https://bitwarden.com/host/
 
-At first install set an `ADMIN_TOKEN` and goto `/admin` and setup an Account, then remove the `ADMIN_TOKEN`
+At first install set an `ADMIN_TOKEN` and goto `/admin` and setup an Account, then remove the `ADMIN_TOKEN` and rebuild the docker.

@@ -13,8 +13,6 @@ outline/pgdata/
 # Postgres
 postgres/pgadmin/
 postgres/data/
-#Immich
-/immich
 # Template
 docker-compose.yaml.template
 # Vaultwarden Vault
@@ -25,6 +23,10 @@ tailscale/data
 proxy-tunnel/cloudflared/*
 # Matrix
 /matrix
+# Immich
+immich/postgres
+immich/library
+immich/model-cache
 # mTLS Creds
 mtls.key.pem
 mtls.cert.pem
