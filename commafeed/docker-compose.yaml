@@ -1,0 +1,31 @@
+services:
+  commafeed:
+    image: athou/commafeed:latest-h2
+    container_name: commafeed
+    restart: always
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.commafeed.rule=Host(`feed.${DOMAIN}`)
+      - traefik.http.routers.commafeed.entrypoints=websecure
+      - traefik.http.routers.commafeed.tls=true
+      - traefik.http.routers.commafeed.service=commafeed
+      - traefik.http.services.commafeed.loadbalancer.server.port=8082
+    environment:
+      COMMAFEED_HTTP_CLIENT_MAX_RESPONSE_SIZE: "50M"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    volumes:
+      - ./data/:/commafeed/data
+    networks:
+      - cloudflaretunnel
+
+networks:
+  cloudflaretunnel:
+    external: true

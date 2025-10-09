@@ -6,7 +6,6 @@ Traefik is used as a internal reverseproxy and tunneled into the world wide web 
 .
 └── proxy-tunnel/
     ├── cloudflared/
-    ├── docker-compose.conf.yaml
     ├── docker-compose.yaml
     ├── .env
     └── README.md
@@ -20,13 +19,11 @@ All settings for cloudflared are stored in the cloudflared folder.
 
 It creates the tunnel-uuid.json and cert.pem automatically when logging in:
 
-`docker run -v $PWD/cloudflared:/etc/cloudflared cloudflare/cloudflared login`
+`docker run -v $(pwd)/cloudflared:/home/nonroot/.cloudflared cloudflare/cloudflared login`
 
 and setting up a tunnel:
 
-`docker run -v $PWD/cloudflared:/etc/cloudflared cloudflare/cloudflared tunnel create mytunnel`
-
-'$PWD' has to be replaced with the absolute path!
+`docker run -v $(pwd)/cloudflared:/etc/cloudflared cloudflare/cloudflared tunnel create mytunnel`
 
 The config.yml ist the most important file for cloudflared. The main configuration is handeled there
 
@@ -45,4 +42,8 @@ You can get the UUID from the cloudflared folder after setting up the tunnel!
 ## Traefik:
 
 Traefik is configured through environment variables located in the docker-compose.yaml file.
+
+## Startup
+
+Create the docker network by running: `docker network create cloudflaretunnel` and then startup the containers by typing: `docker compose up -d`.
 
