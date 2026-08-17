@@ -1,0 +1,26 @@
+services:
+  fredy:
+    image: ghcr.io/orangecoding/fredy:master
+    container_name: fredy
+    restart: always
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.fredy.rule=Host(`fredy.${DOMAIN}`)
+      - traefik.http.routers.fredy.entrypoints=websecure
+      - traefik.http.routers.fredy.tls=true
+      - traefik.http.routers.fredy.service=fredy
+      - traefik.http.services.fredy.loadbalancer.server.port=9998
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+    volumes:
+      - ./db/:/db/
+      - ./conf/:/conf/
+    networks:
+      - cloudflaretunnel
+
+networks:
+  cloudflaretunnel:
+    external: true

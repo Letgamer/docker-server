@@ -7,6 +7,8 @@ services:
     configs:
       - source: config.yml
         target: /etc/cloudflared/config.yml
+    environment:
+      TUNNEL_MANAGEMENT_DIAGNOSTICS: false
     volumes:
       - ./cloudflared:/etc/cloudflared
     logging:
@@ -14,6 +16,8 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
+    healthcheck:
+      test: [ "CMD", "cloudflared", "tunnel", "--metrics", "localhost:60123", "ready" ]
     networks:
       - cftunnel-transport
 
@@ -53,7 +57,7 @@ services:
       ## The TLS connection to Docker accepts any certificate presented by the server regardless of the hostnames it covers
       TRAEFIK_SERVERSTRANSPORT_INSECURESKIPVERIFY: 'true'
     healthcheck:
-        test: ['CMD-SHELL', "wget -nv -t1 --spider 'http://localhost:8080/ping' || exit 1"]
+      test: [ 'CMD-SHELL', "wget -nv -t1 --spider 'http://localhost:8080/ping' || exit 1" ]
     depends_on:
       tunnel:
         condition: service_started

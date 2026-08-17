@@ -3,6 +3,9 @@
 .env
 # The Blog is hosted on another repo
 blog/
+# Bloodhound
+bloodhound/neo4j-data
+bloodhound/postgres-data
 # Crafty Data
 crafty/crafty
 # RSS Data
@@ -14,11 +17,6 @@ gitea/pgdata
 outline/data/
 outline/database-data/
 outline/pgdata/
-# Postgres
-postgres/pgadmin/
-postgres/data/
-# Template
-docker-compose.yaml.template
 # Vaultwarden Vault
 vaultwarden/data
 # Tailscale
@@ -27,6 +25,9 @@ tailscale/data
 proxy-tunnel/cloudflared/*
 # Matrix
 /matrix
+# Paperless
+paperless/paperless
+paperless/redis
 # Immich
 immich/postgres
 immich/library
@@ -35,3 +36,6 @@ immich/model-cache
 mtls.key.pem
 mtls.cert.pem
 mtls_client_cert.pfx
+
+fredy/db
+velociraptor/datastore

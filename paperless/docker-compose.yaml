@@ -1,0 +1,102 @@
+services:
+  paperlessngx:
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    restart: always
+    container_name: paperlessngx
+    depends_on:
+      broker:
+        condition: service_healthy
+      gotenberg:
+        condition: service_healthy
+      tika:
+        condition: service_healthy
+    volumes:
+      - ./paperless/data:/usr/src/paperless/data
+      - ./paperless/media:/usr/src/paperless/media
+      - ./paperless/export:/usr/src/paperless/export
+      - ./paperless/consume:/usr/src/paperless/consume
+    environment:
+      PAPERLESS_REDIS: redis://broker:6379
+      PAPERLESS_TIKA_ENABLED: 1
+      PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
+      PAPERLESS_TIKA_ENDPOINT: http://tika:9998
+      PAPERLESS_OCR_LANGUAGES: eng
+      PAPERLESS_OCR_LANGUAGE: deu
+      PAPERLESS_URL: https://docs.${DOMAIN}
+      PAPERLESS_SECRET_KEY: ${PAPERLESS_SECRET_KEY}
+      #PAPERLESS_ADMIN_USER: ${USER}
+      #PAPERLESS_ADMIN_PASSWORD: ${PASSWORD}
+      PAPERLESS_ENABLE_SOCIAL_LOGIN: true
+      PAPERLESS_DISABLE_REGULAR_LOGIN: true
+      PAPERLESS_REDIRECT_LOGIN_TO_SSO: true
+      PAPERLESS_SOCIAL_AUTO_SIGNUP: true
+      PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
+      PAPERLESS_SOCIALACCOUNT_PROVIDERS: '{ "openid_connect": { "SCOPE": [ "openid", "profile", "email", "groups" ], "OAUTH_PKCE_ENABLED": true, "APPS": [ { "provider_id": "gitea", "name": "Gitea", "client_id": "${CLIENT_ID}", "secret": "${CLIENT_SECRET}", "settings": { "server_url": "https://git.let-net.cc", "token_auth_method": "client_secret_basic" } } ] } }'
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.paperlessngx.rule=Host(`docs.${DOMAIN}`)
+      - traefik.http.routers.paperlessngx.entrypoints=websecure
+      - traefik.http.routers.paperlessngx.tls=true
+      - traefik.http.routers.paperlessngx.service=paperlessngx
+      - traefik.http.services.paperlessngx.loadbalancer.server.port=8000
+    networks:
+      - paperless
+      - cloudflaretunnel
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  broker:
+    image: docker.io/library/redis:8
+    restart: always
+    container_name: paperless-redis
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+    networks:
+      - paperless
+    volumes:
+      - ./redis:/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+  gotenberg:
+    image: docker.io/gotenberg/gotenberg:8.24
+    restart: always
+    container_name: paperless-gotenberg
+    # The gotenberg chromium route is used to convert .eml files. We do not
+    # want to allow external content like tracking pixels or even javascript.
+    command:
+      - "gotenberg"
+      - "--chromium-disable-javascript=true"
+      - "--chromium-allow-list=file:///tmp/.*"
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:3000/health || exit 1" ]
+    networks:
+      - paperless
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+  tika:
+    image: docker.io/apache/tika:latest
+    restart: always
+    container_name: paperless-tika
+    healthcheck:
+      test: [ "CMD-SHELL", "bash -c 'echo > /dev/tcp/localhost/9998'" ]
+    networks:
+      - paperless
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+networks:
+  paperless:
+  cloudflaretunnel:
+    external: true
