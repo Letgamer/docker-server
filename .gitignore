@@ -1,4 +1,4 @@
-/.git
+.git
 # mostly Github environment variables
 .env
 # The Blog is hosted on another repo
@@ -8,8 +8,12 @@ bloodhound/neo4j-data
 bloodhound/postgres-data
 # Crafty Data
 crafty/crafty
+# Chatbot hosted in another repo
+chatbot/
 # RSS Data
 commafeed/data
+# Fredy
+fredy/db
 # Gitea
 gitea/gitea
 gitea/pgdata
@@ -32,10 +36,3 @@ paperless/redis
 immich/postgres
 immich/library
 immich/model-cache
-# mTLS Creds
-mtls.key.pem
-mtls.cert.pem
-mtls_client_cert.pfx
-
-fredy/db
-velociraptor/datastore

@@ -18,7 +18,7 @@ https://github.com/dani-garcia/vaultwarden/blob/main/.env.template
 A .env File is needed with the following contents:
 
 ```
-VAULTWARDEN_DOMAIN=vaultwarden.example.com
+DOMAIN=example.com
 
 PUSH_INSTALLATION_ID=
 

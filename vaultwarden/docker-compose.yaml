@@ -4,33 +4,19 @@ services:
     container_name: vaultwarden
     restart: always
     environment:
+      ## Set an admin token for first install to access /admin and create the user account
+      #ADMIN_TOKEN: '${ADMIN_TOKEN}'
       ## Enables push notifications (requires key and id from https://bitwarden.com/host)
       PUSH_ENABLED: 'true'
       PUSH_INSTALLATION_ID: '${PUSH_INSTALLATION_ID}'
       PUSH_INSTALLATION_KEY: '${PUSH_INSTALLATION_KEY}'
       PUSH_RELAY_URI: 'https://api.bitwarden.eu'
       PUSH_IDENTITY_URI: 'https://identity.bitwarden.eu'
-      ## Controls whether event logging is enabled for organizations
-      ## This setting applies to organizations.
-      ## Disabled by default. Also check the EVENT_CLEANUP_SCHEDULE and EVENTS_DAYS_RETAIN settings.
-      ORG_EVENTS_ENABLED: 'true'
-      ## Number of days to retain events stored in the database.
-      ## If unset (the default), events are kept indefinitely and the scheduled job is disabled!
-      EVENTS_DAYS_RETAIN: 30
-      ## BETA FEATURE: Groups
-      ## Controls whether group support is enabled for organizations
-      ## This setting applies to organizations.
-      ## Disabled by default because this is a beta feature, it contains known issues!
-      ## KNOW WHAT YOU ARE DOING!
-      ORG_GROUPS_ENABLED: 'true'
       ## Logging to Syslog
       ## This requires extended logging
       USE_SYSLOG: 'true'
       ## Controls if new users can register
       SIGNUPS_ALLOWED: 'false'
-      ## Controls if new users from a list of comma-separated domains can register
-      ## even if SIGNUPS_ALLOWED is set to false
-      SIGNUPS_DOMAINS_WHITE_LIST: 'vaultwarden.${DOMAIN}'
       ## Invitations org admins to invite users, even when signups are disabled
 #      INVITATIONS_ALLOWED: 'false'
       ## Number of days to wait before auto-deleting a trashed item.
