@@ -31,7 +31,7 @@ services:
       PAPERLESS_REDIRECT_LOGIN_TO_SSO: true
       PAPERLESS_SOCIAL_AUTO_SIGNUP: true
       PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
-      PAPERLESS_SOCIALACCOUNT_PROVIDERS: '{ "openid_connect": { "SCOPE": [ "openid", "profile", "email", "groups" ], "OAUTH_PKCE_ENABLED": true, "APPS": [ { "provider_id": "gitea", "name": "Gitea", "client_id": "${CLIENT_ID}", "secret": "${CLIENT_SECRET}", "settings": { "server_url": "https://git.let-net.cc", "token_auth_method": "client_secret_basic" } } ] } }'
+      PAPERLESS_SOCIALACCOUNT_PROVIDERS: '{ "openid_connect": { "SCOPE": [ "openid", "profile", "email", "groups" ], "OAUTH_PKCE_ENABLED": true, "APPS": [ { "provider_id": "gitea", "name": "Gitea", "client_id": "${CLIENT_ID}", "secret": "${CLIENT_SECRET}", "settings": { "server_url": "https://git.${DOMAIN}", "token_auth_method": "client_secret_basic" } } ] } }'
     labels:
       - traefik.enable=true
       - traefik.http.routers.paperlessngx.rule=Host(`docs.${DOMAIN}`)

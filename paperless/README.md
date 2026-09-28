@@ -26,7 +26,7 @@ CLIENT_SECRET=
 # OIDC SSO
 For `CLIENT_ID` and `CLIENT_SECRET` generate new Gitea OAuth2 Application with the following `redirect_url`:
 ```
-https://docs.let-net.cc/accounts/oidc/gitea/login/callback/
+https://docs.DOMAIN/accounts/oidc/gitea/login/callback/
 ```
 Refer to the Gitea Readme.md on how to do it.
 
