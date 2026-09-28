@@ -27,4 +27,17 @@ PUSH_INSTALLATION_KEY=
 
 Push ID and Key is needed to enable push notifications on mobile clients and can be recieved from here: https://bitwarden.com/host/
 
-At first install set an `ADMIN_TOKEN` and goto `/admin` and setup an Account, then remove the `ADMIN_TOKEN` and rebuild the docker.
+## First Install
+
+During the initial installation, create the primary account first.
+
+Next, create the emergency account and add it to your primary account under Settings -> Emergency Access.
+
+Once both accounts are set up, disable new account registrations and invitations by setting:
+
+```yaml
+SIGNUPS_ALLOWED: 'false'
+INVITATIONS_ALLOWED: 'false'
+```
+
+Finally, recreate the Vaultwarden container for the changes to take effect.

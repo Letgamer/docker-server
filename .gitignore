@@ -8,8 +8,6 @@ bloodhound/neo4j-data
 bloodhound/postgres-data
 # Crafty Data
 crafty/crafty
-# Chatbot hosted in another repo
-chatbot/
 # RSS Data
 commafeed/data
 # Fredy
