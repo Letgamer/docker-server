@@ -78,8 +78,9 @@ services:
       gitea-postgres:
         condition: service_healthy
     volumes:
-      - ./public:/var/lib/gitea/custom/public
       - ./gitea:/data
+      - ./gitea-sys:/etc/gitea
+      - ./gitea-var:/var/lib/gitea
     labels:
       - traefik.enable=true
       - traefik.http.routers.gitea.rule=Host(`git.${DOMAIN}`)
@@ -97,7 +98,7 @@ services:
       - cloudflaretunnel
 
   gitea-postgres:
-    image: docker.io/postgres:16-alpine
+    image: docker.io/postgres:18-alpine
     container_name: gitea-postgres
     restart: always
     environment:
@@ -109,7 +110,7 @@ services:
     healthcheck:
         test: ["CMD-SHELL", "pg_isready", "-U", "${POSTGRES}", "-d", "${POSTGRES}"]
     volumes:
-      - ./pgdata:/var/lib/postgresql/data
+      - ./pgdata:/var/lib/postgresql
     logging:
       driver: "json-file"
       options:

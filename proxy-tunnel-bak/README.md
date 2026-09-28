@@ -1,6 +1,6 @@
 # Traefik + cloudflare tunnel
 
-Traefik is used as a internal reverse-proxy and tunneled into the world wide web through a cloudflare tunnel.
+Traefik is used as a internal reverseproxy and tunneled into the world wide web through a cloudflare tunnel.
 
 ```
 .

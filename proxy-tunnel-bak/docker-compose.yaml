@@ -9,7 +9,6 @@ services:
         target: /etc/cloudflared/config.yml
     environment:
       TUNNEL_MANAGEMENT_DIAGNOSTICS: false
-      TUNNEL_METRICS: '127.0.0.1:60123'
     volumes:
       - ./cloudflared:/etc/cloudflared
     logging:
@@ -18,7 +17,7 @@ services:
         max-size: "10m"
         max-file: "5"
     healthcheck:
-      test: ["CMD", "/cloudflared", "tunnel", "ready"]
+      test: [ "CMD", "cloudflared", "tunnel", "--metrics", "localhost:60123", "ready" ]
     networks:
       - cftunnel-transport
 

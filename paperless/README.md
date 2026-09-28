@@ -1,14 +1,34 @@
+# Outline - Notes Manager
 
-docker exec --user 1000 gitea gitea admin user generate-access-token --scopes all --username USER
+The fastest knowledge base for growing teams. Beautiful, realtime collaborative, feature packed, and markdown compatible.
 
-curl -X POST "https://git.let-net.cc/api/v1/user/applications/oauth2"   -H "Authorization: token <TOKEN>"   -H "Content-Type: application/json"   -d '{
-        "name": "Paperless",
-        "confidential_client": true,
-        "redirect_uris": ["https://docs.let-net.cc/accounts/oidc/gitea/login/callback/"]
-      }'
+```
+.
+└── outline/
+    ├── paperless/
+    ├── redis/
+    ├── docker-compose.yaml
+    ├── .env
+    └── README.md
+```
+
+A .env File is needed with the following contents:
+```
+PAPERLESS_SECRET_KEY=
+
+DOMAIN=example.com
+
+CLIENT_ID=
+
+CLIENT_SECRET=
+```
 
 # OIDC SSO
-To enable SSO follow the commands in the Gitea Readme to create a new OAuth Application and retrieve the CLIENT_ID and CLIENT_SECRET and set them in the .env file
+For `CLIENT_ID` and `CLIENT_SECRET` generate new Gitea OAuth2 Application with the following `redirect_url`:
+```
+https://docs.let-net.cc/accounts/oidc/gitea/login/callback/
+```
+Refer to the Gitea Readme.md on how to do it.
 
 Then disable:
 ```yaml

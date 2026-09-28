@@ -31,6 +31,10 @@ Generate `SECRET_KEY`,`UTILS_SECRET` and `DB_PASS` with:
 openssl rand -hex 32
 ```
 
-For `CLIENT_ID` and `CLIENT_SECRET` generate new Gitea OAuth2 Application.
+For `CLIENT_ID` and `CLIENT_SECRET` generate new Gitea OAuth2 Application with the following `redirect_url`:
+```
+https://docs.let-net.cc/accounts/oidc/gitea/login/callback/
+```
+
 Refere to the Gitea Readme.md on how to do it.
 

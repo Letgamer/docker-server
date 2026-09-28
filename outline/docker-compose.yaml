@@ -7,9 +7,9 @@ services:
       NODE_ENV: "production"
       SECRET_KEY: "${SECRET_KEY}"
       UTILS_SECRET: "${UTILS_SECRET}"
-      DATABASE_URL: "postgres://postgres:${DB_PASS}@postgres:5432/postgres"
+      DATABASE_URL: "postgres://postgres:${DB_PASS}@outline-postgres:5432/postgres"
       PGSSLMODE: "disable"
-      REDIS_URL: "redis://redis:6379"
+      REDIS_URL: "redis://outline-redis:6379"
       URL: "https://outline.${DOMAIN}"
       PORT: "3000"
       FILE_STORAGE: "local"
@@ -28,9 +28,9 @@ services:
       LOG_LEVEL: 'info'
       DEFAULT_LANGUAGE: 'en_US'
     depends_on:
-      redis:
+      outline-redis:
         condition: service_healthy
-      postgres:
+      outline-postgres:
         condition: service_healthy
     volumes:
       - ./data:/var/lib/outline/data
@@ -50,12 +50,14 @@ services:
       - outline
       - cloudflaretunnel
 
-  redis:
+  outline-redis:
     image: docker.io/redis:alpine
     container_name: outline-redis
     restart: always
     healthcheck:
         test: ["CMD", "redis-cli","ping"]
+    volumes:
+      - ./redis-data:/data
     logging:
       driver: "json-file"
       options:
@@ -64,8 +66,8 @@ services:
     networks:
       - outline
 
-  postgres:
-    image: docker.io/postgres:alpine
+  outline-postgres:
+    image: docker.io/postgres:18-alpine
     container_name: outline-postgres
     restart: always
     environment:
@@ -76,7 +78,7 @@ services:
     healthcheck:
         test: ["CMD-SHELL", "pg_isready", "-U","-q", "postgres", "-d", "postgres"]
     volumes:
-      - ./pgdata:/var/lib/postgresql/data
+      - ./pgdata:/var/lib/postgresql
     logging:
       driver: "json-file"
       options:

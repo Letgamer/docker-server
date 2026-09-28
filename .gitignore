@@ -5,6 +5,7 @@
 blog/
 # Bloodhound
 bloodhound/neo4j-data
+bloodhound/neo4j-logs
 bloodhound/postgres-data
 # Crafty Data
 crafty/crafty
@@ -14,23 +15,20 @@ commafeed/data
 fredy/db
 # Gitea
 gitea/gitea
+gitea/gitea-sys
+gitea/gitea-var
 gitea/pgdata
 # Outline
 outline/data/
 outline/database-data/
 outline/pgdata/
-# Vaultwarden Vault
-vaultwarden/data
-# Tailscale
-tailscale/data
+outline/redis-data
 # Coudflared
 proxy-tunnel/cloudflared/*
-# Matrix
-/matrix
 # Paperless
 paperless/paperless
 paperless/redis
-# Immich
-immich/postgres
-immich/library
-immich/model-cache
+# Tailscale
+tailscale/data
+# Vaultwarden Vault
+vaultwarden/data

@@ -20,8 +20,6 @@ services:
       bhe_default_admin_email_address: admin@admin
       bhe_default_admin_first_name: admin
       bhe_default_admin_last_name: admin
-    # volumes:
-    #   - ./bloodhound.config.json:/bloodhound.config.json:ro
     depends_on:
       bloodhound-db:
         condition: service_healthy
@@ -43,7 +41,7 @@ services:
         max-size: "10m"
         max-file: "5"
   bloodhound-db:
-    image: docker.io/library/postgres:16
+    image: docker.io/library/postgres:18-alpine
     restart: always
     container_name: bloodhound-db
     environment:
@@ -54,7 +52,7 @@ services:
     networks:
       - bloodhound
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data
+      - ./postgres-data:/var/lib/postgresql
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U bloodhound -d bloodhound -h 127.0.0.1 -p 5432" ]
     logging:
@@ -74,6 +72,7 @@ services:
       - bloodhound
     volumes:
       - ./neo4j-data:/data
+      - ./neo4j-logs:/logs
     healthcheck:
       test: [ "CMD-SHELL", "wget -O /dev/null -q http://127.0.0.1:7474 || exit 1" ]
     logging:
